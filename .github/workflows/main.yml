@@ -40,7 +40,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/TurlGO:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/turlgo:latest
           platforms: linux/amd64
 
       - name: ssh to ec2
@@ -50,9 +50,9 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           script: |
-            sudo docker stop TurlGO-container || true
-            sudo docker rm TurlGO-container || true
+            sudo docker stop turlgo-container || true
+            sudo docker rm turlgo-container || true
 
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/TurlGO:latest
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/turlgo:latest
             
-            sudo docker run -d --name TurlGO-server-container --env-file .env -p 8080:8080 -e TZ=Asia/Seoul ${{ secrets.DOCKER_USERNAME }}/TurlGO:latest
+            sudo docker run -d --name turlgo-container --env-file .env -p 8080:8080 -e TZ=Asia/Seoul ${{ secrets.DOCKER_USERNAME }}/turlgo:latest
