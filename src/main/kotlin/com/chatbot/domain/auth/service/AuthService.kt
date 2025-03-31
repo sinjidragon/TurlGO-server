@@ -21,13 +21,13 @@ class AuthService (
     private val jwtUtil: JwtUtil,
     private val redisService: RedisService
 ) {
-    fun signup(authSignupRequest: AuthSignupRequest) : BaseResponse<Unit>  {
-        if (userRepository.existsByUsername(authSignupRequest.username))
+    fun signup(request: AuthSignupRequest) : BaseResponse<Unit>  {
+        if(userRepository.findByEmailOrUsername(request.email, request.username).isNotEmpty())
             throw CustomException(UserErrorCode.USER_ALREADY_EXIST)
-
         val user = UserEntity(
-            username = authSignupRequest.username,
-            password = BCryptPasswordEncoder().encode(authSignupRequest.password),
+            username = request.username,
+            email = request.email,
+            password = BCryptPasswordEncoder().encode(request.password),
         )
         userRepository.save(user)
 
@@ -37,7 +37,7 @@ class AuthService (
     }
 
     fun login(authLoginRequest: AuthLoginRequest) : BaseResponse<AuthTokenResponse> {
-        var user = userRepository.findByUsername(authLoginRequest.username).orElseThrow {
+        val user = userRepository.findByUsername(authLoginRequest.username).orElseThrow {
             throw CustomException(UserErrorCode.USER_NOT_FOUND)
         }
 
