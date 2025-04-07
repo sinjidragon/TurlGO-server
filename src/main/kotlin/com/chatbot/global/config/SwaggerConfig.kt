@@ -15,7 +15,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @Configuration
 @OpenAPIDefinition(
     info = io.swagger.v3.oas.annotations.info.Info(
-        title = "chatbot", //TODO: 스웨거 설정 변경
+        title = "TurlGO",
         version = "1.0",
     )
 )
@@ -33,7 +33,7 @@ class SwaggerConfig : WebMvcConfigurer {
             )
             .addServersItem(Server().url("/"))
             .info(
-                Info().title("JWT-Template")
+                Info().title("TurlGO")
                     .version("v1.0.0")
             )
     }
