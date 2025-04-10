@@ -30,3 +30,20 @@ data class AnimalRow(
     val INTRCN_CN: String?,
     val TMPR_PRTC_CN: String?
 )
+
+data class ApiPhotoResponse(
+    val TbAdpWaitAnimalPhotoView: TbAdpWaitAnimalPhotoView
+)
+
+data class TbAdpWaitAnimalPhotoView(
+    val list_total_count: Int,
+    val RESULT: Result,
+    val row: List<PhotoRow>
+)
+
+data class PhotoRow(
+    val ANIMAL_NO: String,
+    val PHOTO_KND: String,
+    val PHOTO_NO: Int,
+    val PHOTO_URL: String
+)

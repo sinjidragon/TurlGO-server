@@ -18,7 +18,7 @@ class AnimalController (
     @Operation(summary = "쓰지마라")
     @GetMapping("/test")
     fun test():String {
-        animalScheduledService.fetchAndSaveAnimalData()
+        animalScheduledService.fetchAnimalDataDaily()
         return "아니쓰지말라고햇잖아"
     }
 

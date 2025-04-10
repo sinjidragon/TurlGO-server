@@ -1,10 +1,8 @@
 package com.chatbot.domain.animal.entity
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
+import jakarta.persistence.*
 
-@Entity(name = "animal")
+@Entity(name = "animals")
 class AnimalEntity (
     @Id
     val animalNo: String,
@@ -24,5 +22,13 @@ class AnimalEntity (
     val introductionContent: String?,
 
     @Column(columnDefinition = "TEXT")
-    val temporaryProtectionContent: String?
+    val temporaryProtectionContent: String?,
+
+    @ElementCollection
+    @CollectionTable(
+        name = "animal_photos",
+        joinColumns = [JoinColumn(name = "animal_no")]
+    )
+    @Column(name = "photo_url")
+    val photoUrls: List<String> = emptyList()
 )

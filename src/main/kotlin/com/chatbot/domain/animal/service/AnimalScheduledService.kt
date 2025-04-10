@@ -1,5 +1,6 @@
 package com.chatbot.domain.animal.service
 
+import com.chatbot.domain.animal.dto.ApiPhotoResponse
 import com.chatbot.domain.animal.dto.ApiResponse
 import com.chatbot.domain.animal.entity.AnimalEntity
 import com.chatbot.domain.animal.repository.AnimalRepository
@@ -17,11 +18,14 @@ class AnimalScheduledService(
     private val restTemplate: RestTemplate,
 
     @Value("\${openapi.key1}")
-    private val apiUrl: String
+    private val apiUrl1: String,
+
+    @Value("\${openapi.key2}")
+    private val apiUrl2: String,
 ) {
     fun fetchAndSaveAnimalData() {
         try {
-            val response = restTemplate.getForObject(apiUrl, ApiResponse::class.java)
+            val response = restTemplate.getForObject(apiUrl1, ApiResponse::class.java)
                 ?: throw RuntimeException("API 응답 실패")
 
             if (response.TbAdpWaitAnimalView.RESULT.CODE != "INFO-000") {
@@ -29,6 +33,8 @@ class AnimalScheduledService(
             }
 
             log.info("총 ${response.TbAdpWaitAnimalView.row.size}개의 동물 데이터를 받았습니다.")
+
+            val photoMap = fetchPhotoData()
 
             response.TbAdpWaitAnimalView.row.forEach { animalRow ->
                 try {
@@ -48,7 +54,9 @@ class AnimalScheduledService(
                         temporaryProtectionStatus = animalRow.TMPR_PRTC_STTUS,
                         introductionVideoUrl = animalRow.INTRCN_MVP_URL,
                         introductionContent = cleanIntroContent,
-                        temporaryProtectionContent = cleanProtectionContent
+                        temporaryProtectionContent = cleanProtectionContent,
+                        photoUrls = photoMap[animalRow.ANIMAL_NO] ?: emptyList()
+
                     )
 
                     val existingAnimal = animalRepository.findById(animalEntity.animalNo)
@@ -69,6 +77,22 @@ class AnimalScheduledService(
         } catch (e: Exception) {
             log.error("데이터 조회 또는 저장 중 오류 발생", e)
             throw e
+        }
+    }
+
+    private fun fetchPhotoData(): Map<String, List<String>> {
+        return try {
+            val photoResponse = restTemplate.getForObject(apiUrl2, ApiPhotoResponse::class.java)
+            log.info("${photoResponse.toString()} 사진데이터 수집")
+            photoResponse?.TbAdpWaitAnimalPhotoView?.row
+                ?.groupBy { it.ANIMAL_NO }
+                ?.mapValues { entry ->
+                    entry.value.map { it.PHOTO_URL }
+                } ?: emptyMap()
+
+        } catch (e: Exception) {
+            log.error("사진 데이터 수집 실패", e)
+            emptyMap()
         }
     }
 
