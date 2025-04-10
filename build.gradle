@@ -37,6 +37,7 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.jsoup:jsoup:1.15.4'
 
     // JJWT
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
