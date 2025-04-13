@@ -5,6 +5,7 @@ import com.chatbot.domain.auth.dto.request.AuthRefreshRequest
 import com.chatbot.domain.auth.dto.request.AuthSignupRequest
 import com.chatbot.domain.auth.dto.response.AuthTokenResponse
 import com.chatbot.domain.user.entity.UserEntity
+import com.chatbot.domain.user.entity.UserState
 import com.chatbot.domain.user.exception.UserErrorCode
 import com.chatbot.domain.user.repository.UserRepository
 import com.chatbot.global.dto.BaseResponse
@@ -43,6 +44,9 @@ class AuthService (
 
         if (!BCryptPasswordEncoder().matches(authLoginRequest.password, user.password))
             throw CustomException(UserErrorCode.USER_NOT_MATCH)
+
+        if (user.state === UserState.DELETED)
+            throw CustomException(UserErrorCode.USER_IS_DELETED)
 
         return BaseResponse(
             message = "로그인 성공",
