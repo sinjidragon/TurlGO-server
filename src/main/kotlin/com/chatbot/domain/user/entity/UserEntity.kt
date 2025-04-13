@@ -3,6 +3,7 @@ package com.chatbot.domain.user.entity
 import jakarta.persistence.*
 import lombok.AccessLevel
 import lombok.NoArgsConstructor
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "users")
@@ -20,4 +21,9 @@ class UserEntity (
 
     @Column(nullable = false)
     var password: String,
+
+    @Column(nullable = false) @Enumerated(EnumType.STRING)
+    var state: UserState? = UserState.CREATED,
+
+    var deletedAt: LocalDateTime? = null
 )
