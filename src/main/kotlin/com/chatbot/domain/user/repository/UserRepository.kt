@@ -7,6 +7,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 interface UserRepository : JpaRepository<UserEntity, Long> {
+    override fun findById(id: Long): Optional<UserEntity>
     fun findByStateAndDeletedAtBefore(state: UserState?, date: LocalDateTime?): List<UserEntity?>?
     fun findByEmail(email: String): Optional<UserEntity>
     fun findByUsername(username: String): Optional<UserEntity>

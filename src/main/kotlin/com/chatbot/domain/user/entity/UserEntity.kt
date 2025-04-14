@@ -23,7 +23,11 @@ class UserEntity (
     var password: String,
 
     @Column(nullable = false) @Enumerated(EnumType.STRING)
-    var state: UserState? = UserState.CREATED,
+    var state: UserState = UserState.CREATED,
 
-    var deletedAt: LocalDateTime? = null
+    var deletedAt: LocalDateTime? = null,
+
+    var isTested: Boolean = false,
+
+    var testData: String? = null,
 )
