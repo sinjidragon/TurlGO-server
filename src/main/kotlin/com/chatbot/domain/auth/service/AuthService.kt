@@ -22,6 +22,13 @@ class AuthService (
     private val jwtUtil: JwtUtil,
     private val redisService: RedisService
 ) {
+    fun checkUsername(username: String?): BaseResponse<Unit> {
+        if (username?.let { userRepository.findByUsername(it) } != null)
+            throw CustomException(UserErrorCode.USERNAME_ALREADY_EXIST)
+
+        return BaseResponse(message = "checkUsername successful")
+    }
+
     fun signup(request: AuthSignupRequest) : BaseResponse<Unit>  {
         if(userRepository.findByEmailOrUsername(request.email, request.username).isNotEmpty())
             throw CustomException(UserErrorCode.USER_ALREADY_EXIST)

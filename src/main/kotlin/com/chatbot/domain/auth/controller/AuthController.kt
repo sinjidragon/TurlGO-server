@@ -3,10 +3,11 @@ package com.chatbot.domain.auth.controller
 import com.chatbot.domain.auth.dto.request.*
 import com.chatbot.domain.auth.dto.response.AuthTokenResponse
 import com.chatbot.domain.auth.service.AuthService
-import com.chatbot.global.dto.BaseResponse
 import com.chatbot.domain.auth.service.MailService
+import com.chatbot.global.dto.BaseResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @Tag(name = "Auth", description = "인증/인가")
@@ -17,6 +18,12 @@ class AuthController (
     private val mailService: MailService
 
 ) {
+    @Operation(summary = "아이디 중복 확인")
+    @GetMapping("/check-username")
+    fun checkUsername(@RequestParam("username") username: String?): BaseResponse<Unit> {
+        return authService.checkUsername(username)
+    }
+
     @Operation(summary = "Login")
     @PostMapping("/login")
     fun login(@RequestBody authLoginRequest: AuthLoginRequest): BaseResponse<AuthTokenResponse> {
