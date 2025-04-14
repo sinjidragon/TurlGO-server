@@ -23,8 +23,10 @@ class AuthService (
     private val redisService: RedisService
 ) {
     fun checkUsername(username: String?): BaseResponse<Unit> {
-        if (username?.let { userRepository.findByUsername(it) } != null)
-            throw CustomException(UserErrorCode.USERNAME_ALREADY_EXIST)
+        if (username != null) {
+            if (userRepository.existsByUsername(username))
+                throw CustomException(UserErrorCode.USERNAME_ALREADY_EXIST)
+        }
 
         return BaseResponse(message = "checkUsername successful")
     }
