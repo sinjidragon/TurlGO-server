@@ -29,5 +29,6 @@ class UserEntity (
 
     var isTested: Boolean = false,
 
+    @Column(length = 5000)
     var testData: String? = null,
 )

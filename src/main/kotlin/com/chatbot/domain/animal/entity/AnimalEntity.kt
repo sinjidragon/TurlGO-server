@@ -32,5 +32,6 @@ class AnimalEntity (
     @Column(name = "photo_url")
     var photoUrls: List<String> = emptyList(),
 
+    @Column(length = 5000)
     var calculatedData : String? = null
 )
