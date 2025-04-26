@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate
 class AnimalScheduledService(
     private val animalRepository: AnimalRepository,
     private val restTemplate: RestTemplate,
+    private val animalCalculatorService: AnimalCalculatorService,
 
     @Value("\${openapi.key1}")
     private val apiUrl1: String,
@@ -55,8 +56,8 @@ class AnimalScheduledService(
                         introductionVideoUrl = animalRow.INTRCN_MVP_URL,
                         introductionContent = cleanIntroContent,
                         temporaryProtectionContent = cleanProtectionContent,
-                        photoUrls = photoMap[animalRow.ANIMAL_NO] ?: emptyList()
-
+                        photoUrls = photoMap[animalRow.ANIMAL_NO] ?: emptyList(),
+                        calculatedData = animalCalculatorService.sendMessage(cleanIntroContent + animalRow.SPCS)
                     )
 
                     val existingAnimal = animalRepository.findById(animalEntity.animalNo)

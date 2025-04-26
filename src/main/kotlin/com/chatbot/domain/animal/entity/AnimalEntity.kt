@@ -5,24 +5,24 @@ import jakarta.persistence.*
 @Entity(name = "animals")
 class AnimalEntity (
     @Id
-    val animalNo: String,
+    var animalNo: String,
 
-    val name: String,
-    val entranceDate: String,
-    val species: String,
-    val breed: String,
-    val sex: String,
-    val age: String,
-    val bodyWeight: Double,
-    val adoptionStatus: String,
-    val temporaryProtectionStatus: String,
-    val introductionVideoUrl: String,
-
-    @Column(columnDefinition = "TEXT")
-    val introductionContent: String?,
+    var name: String,
+    var entranceDate: String,
+    var species: String,
+    var breed: String,
+    var sex: String,
+    var age: String,
+    var bodyWeight: Double,
+    var adoptionStatus: String,
+    var temporaryProtectionStatus: String,
+    var introductionVideoUrl: String,
 
     @Column(columnDefinition = "TEXT")
-    val temporaryProtectionContent: String?,
+    var introductionContent: String?,
+
+    @Column(columnDefinition = "TEXT")
+    var temporaryProtectionContent: String?,
 
     @ElementCollection
     @CollectionTable(
@@ -30,5 +30,7 @@ class AnimalEntity (
         joinColumns = [JoinColumn(name = "animal_no")]
     )
     @Column(name = "photo_url")
-    val photoUrls: List<String> = emptyList()
+    var photoUrls: List<String> = emptyList(),
+
+    var calculatedData : String? = null
 )

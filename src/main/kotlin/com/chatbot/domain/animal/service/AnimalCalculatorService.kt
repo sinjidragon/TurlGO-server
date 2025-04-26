@@ -1,14 +1,9 @@
-package com.chatbot.domain.chat.service
+package com.chatbot.domain.animal.service
 
-import com.chatbot.domain.chat.entity.ChatHistory
-import com.chatbot.domain.chat.entity.ChatMessage
-import com.chatbot.domain.chat.exception.ChatErrorCode
-import com.chatbot.domain.chat.repository.ChatRepository
 import com.chatbot.global.exception.CustomException
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import org.hibernate.query.sqm.tree.SqmNode.log
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -19,16 +14,14 @@ import org.springframework.web.client.RestTemplate
 import java.lang.Thread.sleep
 
 @Service
-class ChatService (
+class AnimalCalculatorService (
     private val objectMapper: ObjectMapper,
 
     @Value("\${spring.ai.openai.api-key}")
     private val apiKey: String,
 
-    @Value("\${spring.ai.openai.assistantId2}")
+    @Value("\${spring.ai.openai.assistantId1}")
     private val assistantId: String,
-
-    private val chatRepository: ChatRepository,
 ) {
     private val restTemplate = RestTemplate()
     private val apiUrl = "https://api.openai.com/v1/threads"
@@ -39,17 +32,12 @@ class ChatService (
         set("OpenAI-Beta", "assistants=v2")
     }
 
-    fun sendMessage(userId: String, message: String): ChatMessage {
-        val chatHistory = chatRepository.findByUserId(userId)
-        val threadId = chatHistory!!.threadId
-
-        val userMessage = ChatMessage(content = message, role = "user")
-        chatHistory.messages.add(userMessage)
-
+    fun sendMessage(message: String): String {
+        val threadId = createThread()
         createMessage(threadId, message)
         val runId = runAssistant(threadId)
         sleep(1000)
-        return getStatus(threadId, runId, chatHistory)
+        return getStatus(threadId, runId)
     }
 
     // thread 발급
@@ -66,7 +54,7 @@ class ChatService (
             "role" to "user",
             "content" to message
         )
-        val entity = HttpEntity(requestBody,headers)
+        val entity = HttpEntity(requestBody, headers)
         restTemplate.exchange("$apiUrl/$threadId/messages", HttpMethod.POST, entity, String::class.java)
     }
 
@@ -75,72 +63,43 @@ class ChatService (
         val requestBody = mapOf(
             "assistant_id" to assistantId,
         )
-        val entity = HttpEntity(requestBody,headers)
+        val entity = HttpEntity(requestBody, headers)
         val response = restTemplate.exchange("$apiUrl/$threadId/runs", HttpMethod.POST, entity, String::class.java)
-        val objectMapper = ObjectMapper()
         val jsonNode: JsonNode = objectMapper.readTree(response.body)
-        val id = jsonNode["id"]?.asText() ?: ""
-        return id
+        return jsonNode["id"]?.asText() ?: ""
     }
 
-    fun getStatus(threadId: String, runId: String, chatHistory: ChatHistory): ChatMessage {
+    fun getStatus(threadId: String, runId: String): String {
         while (true) {
             try {
                 val entity = HttpEntity<String>(headers)
                 val response = restTemplate.exchange("$apiUrl/$threadId/runs/$runId", HttpMethod.GET, entity, String::class.java)
-                val objectMapper = ObjectMapper()
                 val jsonNode: JsonNode = objectMapper.readTree(response.body)
                 val status = jsonNode["status"]?.asText() ?: ""
 
                 if (status != "completed") {
-                    log.warn("i")
                     sleep(500)
                 } else {
-                    return getMessage(chatHistory, threadId)
+                    return getMessage(threadId)
                 }
             } catch (e: Exception) {
-                log.error(e.message, e)
-                throw CustomException(ChatErrorCode.GET_CHAT_ERROR)
+
             }
         }
     }
 
     // 메시지 가져오기
-    fun getMessage(chatHistory: ChatHistory, threadId: String): ChatMessage{
-
+    fun getMessage(threadId: String): String {
         val entity = HttpEntity<String>(headers)
-        val response =
-            restTemplate.exchange("$apiUrl/$threadId/messages", HttpMethod.GET, entity, String::class.java)
+        val response = restTemplate.exchange("$apiUrl/$threadId/messages", HttpMethod.GET, entity, String::class.java)
         val responseBody = objectMapper.readValue<Map<String, Any>>(response.body!!)
-
         val data = responseBody["data"] as? List<Map<String, Any>>
         val firstMessage = data?.firstOrNull()
-
-        val role = firstMessage?.get("role") as? String ?: ""
         val contentList = firstMessage?.get("content") as? List<Map<String, Any>>
-
         val value = contentList?.firstOrNull()?.let { contentItem ->
             val textMap = contentItem["text"] as? Map<String, Any>
             textMap?.get("value") as? String
         }
-
-        val assistantMessage = ChatMessage(
-            content = value.toString(),
-            role = "assistant"
-        )
-        chatHistory.messages.add(assistantMessage)
-        chatRepository.save(chatHistory)
-        return assistantMessage
-    }
-
-
-    fun clearHistory(userId: String) {
-        val history = chatRepository.findByUserId(userId)
-        history?.messages?.clear()
-        history?.let { chatRepository.save(it) }
-    }
-
-    fun getHistory(userId: String): List<ChatMessage> {
-        return chatRepository.findByUserId(userId)?.messages ?: emptyList()
+        return value ?: ""
     }
 }

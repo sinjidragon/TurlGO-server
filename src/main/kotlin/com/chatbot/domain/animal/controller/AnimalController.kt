@@ -5,7 +5,9 @@ import com.chatbot.domain.animal.service.AnimalService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @Tag(name = "Animal", description = "동물 관련")
@@ -25,4 +27,8 @@ class AnimalController (
     @Operation(summary = "동물 목록")
     @GetMapping()
     fun getAnimals() = animalService.getAnimals()
+
+    @Operation(summary = "동물 상세 정보")
+    @GetMapping("/{animalNo}")
+    fun getAnimal(@PathVariable animalNo: String) = animalService.getAnimal(animalNo)
 }

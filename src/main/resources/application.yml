@@ -18,7 +18,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
@@ -26,7 +26,8 @@ spring:
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
-      assistantId: ${OPENAI_ASSISTANT_ID}
+      assistantId1: ${OPENAI_ASSISTANT_ID1}
+      assistantId2: ${OPENAI_ASSISTANT_ID2}
 
   mail:
     host: smtp.gmail.com
