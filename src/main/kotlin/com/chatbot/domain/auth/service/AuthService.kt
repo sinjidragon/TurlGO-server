@@ -32,6 +32,8 @@ class AuthService (
     }
 
     fun signup(request: AuthSignupRequest) : BaseResponse<Unit>  {
+        if (userRepository.existsByUsername(request.username))
+            throw CustomException(UserErrorCode.USERNAME_ALREADY_EXIST)
         if(userRepository.findByEmailOrUsername(request.email, request.username).isNotEmpty())
             throw CustomException(UserErrorCode.USER_ALREADY_EXIST)
         val user = UserEntity(
