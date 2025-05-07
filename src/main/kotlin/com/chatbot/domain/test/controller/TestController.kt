@@ -1,6 +1,6 @@
 package com.chatbot.domain.test.controller
 
-import com.chatbot.domain.test.dto.AnimalDetailResponse
+import com.chatbot.domain.test.dto.AnimalDetailRequest
 import com.chatbot.domain.test.service.TestService
 import com.chatbot.global.dto.BaseResponse
 import io.swagger.v3.oas.annotations.Operation
@@ -24,7 +24,7 @@ class TestController (
             "    specialTraits, (optional) 특정 역할, 특징 (고양이면 알러지 강한지/특이 외모 등)\n" +
             "    gender,           성별")
     @PostMapping()
-    fun petTest(@RequestBody request: AnimalDetailResponse, principal: Principal): BaseResponse<String> {
+    fun petTest(@RequestBody request: AnimalDetailRequest, principal: Principal): BaseResponse<String> {
         return testService.sendMessage(request, principal)
     }
 

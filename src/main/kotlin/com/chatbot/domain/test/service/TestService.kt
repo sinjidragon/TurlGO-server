@@ -1,6 +1,6 @@
 package com.chatbot.domain.test.service
 
-import com.chatbot.domain.test.dto.AnimalDetailResponse
+import com.chatbot.domain.test.dto.AnimalDetailRequest
 import com.chatbot.domain.user.exception.UserErrorCode
 import com.chatbot.domain.user.repository.UserRepository
 import com.chatbot.global.dto.BaseResponse
@@ -39,10 +39,10 @@ class TestService (
         set("OpenAI-Beta", "assistants=v2")
     }
 
-    fun sendMessage(request: AnimalDetailResponse, principal: Principal): BaseResponse<String> {
+    fun sendMessage(request: AnimalDetailRequest, principal: Principal): BaseResponse<String> {
         val user = userRepository.findByUsername(principal.name).orElseThrow { CustomException(UserErrorCode.USER_NOT_FOUND) }
 
-        val message = "${request.species} ${request.sizeOrBodyType} ${request.personality} ${request.furTypeOrLength} ${request.specialTraits} ${request.gender}"
+        val message = "${request.housingType}, ${request.preferredAnimal}, ${request.preferredPersonality}, ${request.sheddingSensitivity}, ${request.availableTime}, ${request.budget}, ${request.hasAllergy}"
         val threadId = createThread()
         createMessage(threadId, message)
         val runId = runAssistant(threadId)
